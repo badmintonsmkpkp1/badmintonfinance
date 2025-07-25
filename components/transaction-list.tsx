@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, TrendingDown } from "lucide-react"
+import { motion } from "framer-motion"
 
 interface Transaction {
   id: string
@@ -10,6 +11,7 @@ interface Transaction {
   description: string
   date: string
   created_at: string
+  category?: string
 }
 
 interface TransactionListProps {
@@ -21,9 +23,9 @@ export function TransactionList({ transactions, formatCurrency }: TransactionLis
   if (transactions.length === 0) {
     return (
       <div className="text-center py-8">
-        <div className="text-gray-400 mb-2">📊</div>
-        <p className="text-gray-500">Belum ada transaksi</p>
-        <p className="text-sm text-gray-400">Tambahkan transaksi pertama Anda</p>
+        <div className="text-gray-400 dark:text-gray-600 mb-2">📊</div>
+        <p className="text-gray-500 dark:text-gray-400">Belum ada transaksi</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">Tambahkan transaksi pertama Anda</p>
       </div>
     )
   }
@@ -36,17 +38,52 @@ export function TransactionList({ transactions, formatCurrency }: TransactionLis
     })
   }
 
+  const getCategoryLabel = (category?: string) => {
+    if (!category) return "Lainnya"
+
+    const categories: Record<string, string> = {
+      "kas-anggota": "Kas Anggota",
+      peralatan: "Peralatan",
+      "sewa-lapangan": "Sewa Lapangan",
+      konsumsi: "Konsumsi",
+      transport: "Transport",
+      turnamen: "Turnamen",
+      lainnya: "Lainnya",
+    }
+
+    return categories[category] || category.replace("-", " ").toUpperCase()
+  }
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
+  }
+
   return (
-    <div className="space-y-3">
+    <motion.div className="space-y-3" variants={container} initial="hidden" animate="show">
       {transactions.map((transaction) => (
-        <div
+        <motion.div
           key={transaction.id}
-          className="flex items-center justify-between p-4 rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors"
+          variants={item}
+          className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent transition-colors"
+          whileHover={{ scale: 1.01 }}
         >
           <div className="flex items-center gap-3">
             <div
               className={`p-2 rounded-full ${
-                transaction.type === "income" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+                transaction.type === "income"
+                  ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300"
+                  : "bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300"
               }`}
             >
               {transaction.type === "income" ? (
@@ -56,12 +93,21 @@ export function TransactionList({ transactions, formatCurrency }: TransactionLis
               )}
             </div>
             <div>
-              <p className="font-medium text-gray-900">{transaction.description}</p>
-              <p className="text-sm text-gray-500">{formatDate(transaction.date)}</p>
+              <p className="font-medium text-foreground">{transaction.description}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-muted-foreground">{formatDate(transaction.date)}</p>
+                {transaction.category && (
+                  <Badge variant="outline" className="text-xs">
+                    {getCategoryLabel(transaction.category)}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
           <div className="text-right">
-            <p className={`font-bold ${transaction.type === "income" ? "text-green-600" : "text-red-600"}`}>
+            <p
+              className={`font-bold ${transaction.type === "income" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
+            >
               {transaction.type === "income" ? "+" : "-"}
               {formatCurrency(transaction.amount)}
             </p>
@@ -69,8 +115,8 @@ export function TransactionList({ transactions, formatCurrency }: TransactionLis
               {transaction.type === "income" ? "Masuk" : "Keluar"}
             </Badge>
           </div>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   )
 }
