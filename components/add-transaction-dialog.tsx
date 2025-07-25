@@ -27,6 +27,16 @@ interface Member {
   status: string
 }
 
+const categories = [
+  { value: "kas-anggota", label: "💰 Kas Anggota" },
+  { value: "peralatan", label: "🏸 Peralatan" },
+  { value: "sewa-lapangan", label: "🏟️ Sewa Lapangan" },
+  { value: "konsumsi", label: "🥤 Konsumsi" },
+  { value: "transport", label: "🚌 Transport" },
+  { value: "turnamen", label: "🏆 Turnamen" },
+  { value: "lainnya", label: "📝 Lainnya" },
+]
+
 export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, members }: AddTransactionDialogProps) {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -34,12 +44,13 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, m
     amount: "",
     description: "",
     date: new Date().toISOString().split("T")[0],
+    category: "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.type || !formData.amount || !formData.description) {
+    if (!formData.type || !formData.amount || !formData.description || !formData.category) {
       toast({
         title: "Error",
         description: "Mohon lengkapi semua field yang diperlukan",
@@ -57,6 +68,7 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, m
           amount: Number.parseFloat(formData.amount),
           description: formData.description,
           date: formData.date,
+          category: formData.category,
         },
       ])
 
@@ -72,6 +84,7 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, m
         amount: "",
         description: "",
         date: new Date().toISOString().split("T")[0],
+        category: "",
       })
 
       onTransactionAdded()
@@ -103,6 +116,22 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, m
               <SelectContent>
                 <SelectItem value="income">💰 Pemasukan</SelectItem>
                 <SelectItem value="expense">💸 Pengeluaran</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Kategori</Label>
+            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih kategori" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.value} value={category.value}>
+                    {category.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

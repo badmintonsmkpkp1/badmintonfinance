@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Plus, TrendingUp, TrendingDown, Wallet, Users, Calendar, CreditCard } from "lucide-react"
+import { Plus, TrendingUp, TrendingDown, Wallet, Users, Calendar, CreditCard, BarChart3, Target } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -11,6 +11,8 @@ import { AddTransactionDialog } from "@/components/add-transaction-dialog"
 import { TransactionList } from "@/components/transaction-list"
 import { MembersManagement } from "@/components/members-management"
 import { PaymentTracking } from "@/components/payment-tracking"
+import { AnalyticsDashboard } from "@/components/analytics-dashboard"
+import { BudgetManagement } from "@/components/budget-management"
 
 interface Transaction {
   id: string
@@ -19,6 +21,7 @@ interface Transaction {
   description: string
   date: string
   created_at: string
+  category?: string
 }
 
 interface Member {
@@ -226,10 +229,18 @@ export default function Dashboard() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-white shadow-sm">
+          <TabsList className="grid w-full grid-cols-6 bg-white shadow-sm">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="budget" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Budget
             </TabsTrigger>
             <TabsTrigger value="members" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
@@ -322,6 +333,14 @@ export default function Dashboard() {
                 <TransactionList transactions={transactions.slice(0, 5)} formatCurrency={formatCurrency} />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <AnalyticsDashboard formatCurrency={formatCurrency} />
+          </TabsContent>
+
+          <TabsContent value="budget">
+            <BudgetManagement formatCurrency={formatCurrency} />
           </TabsContent>
 
           <TabsContent value="members">
