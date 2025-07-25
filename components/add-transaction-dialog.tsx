@@ -34,7 +34,6 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, m
     amount: "",
     description: "",
     date: new Date().toISOString().split("T")[0],
-    category: "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,7 +57,6 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, m
           amount: Number.parseFloat(formData.amount),
           description: formData.description,
           date: formData.date,
-          category: formData.category,
         },
       ])
 
@@ -74,7 +72,6 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, m
         amount: "",
         description: "",
         date: new Date().toISOString().split("T")[0],
-        category: "",
       })
 
       onTransactionAdded()
@@ -106,26 +103,6 @@ export function AddTransactionDialog({ open, onOpenChange, onTransactionAdded, m
               <SelectContent>
                 <SelectItem value="income">💰 Pemasukan</SelectItem>
                 <SelectItem value="expense">💸 Pengeluaran</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Kategori (Opsional)</Label>
-            <Select
-              value={formData.category || ""}
-              onValueChange={(value) => setFormData({ ...formData, category: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="kas-anggota">Kas Anggota</SelectItem>
-                <SelectItem value="peralatan">Peralatan</SelectItem>
-                <SelectItem value="transport">Transport</SelectItem>
-                <SelectItem value="konsumsi">Konsumsi</SelectItem>
-                <SelectItem value="sewa-lapangan">Sewa Lapangan</SelectItem>
-                <SelectItem value="lainnya">Lainnya</SelectItem>
               </SelectContent>
             </Select>
           </div>
