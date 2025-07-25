@@ -9,7 +9,7 @@ import { motion } from "framer-motion"
 import { toast } from "@/hooks/use-toast"
 import { supabase } from "@/lib/supabase"
 import { jsPDF } from "jspdf"
-import autoTable from "jspdf-autotable"
+import "jspdf-autotable"
 import { format } from "date-fns"
 import { id } from "date-fns/locale"
 
@@ -66,7 +66,7 @@ export function PdfReportGenerator({ formatCurrency }: PdfReportGeneratorProps) 
 
       // Add title
       doc.setFontSize(20)
-      doc.text(`Laporan Keuangan Ekstrakurikuler Badminton`, 105, 20, { align: "center" })
+      doc.text("Laporan Keuangan Ekstrakurikuler Badminton", 105, 20, { align: "center" })
       doc.setFontSize(16)
       doc.text(`${monthName} ${selectedYear}`, 105, 30, { align: "center" })
 
@@ -99,7 +99,8 @@ export function PdfReportGenerator({ formatCurrency }: PdfReportGeneratorProps) 
           formatCurrency(t.amount),
         ]) || []
 
-      autoTable(doc, {
+      // Use autoTable with proper typing
+      ;(doc as any).autoTable({
         head: [["Tanggal", "Jenis", "Kategori", "Deskripsi", "Jumlah"]],
         body: transactionRows,
         startY: 105,
@@ -140,8 +141,7 @@ export function PdfReportGenerator({ formatCurrency }: PdfReportGeneratorProps) 
             ]
           }),
         )
-
-        autoTable(doc, {
+        ;(doc as any).autoTable({
           head: [["Kategori", "Budget", "Aktual", "Sisa", "Persentase"]],
           body: budgetRows,
           startY: 30,
@@ -151,12 +151,13 @@ export function PdfReportGenerator({ formatCurrency }: PdfReportGeneratorProps) 
         })
       }
 
-      // Save the PDF
-      doc.save(`Laporan_Keuangan_${monthName}_${selectedYear}.pdf`)
+      // Save the PDF with proper filename
+      const filename = `Laporan_Keuangan_${monthName}_${selectedYear}.pdf`
+      doc.save(filename)
 
       toast({
         title: "Berhasil!",
-        description: "Laporan keuangan berhasil dibuat",
+        description: `Laporan keuangan berhasil dibuat: ${filename}`,
       })
     } catch (error) {
       console.error("Error generating report:", error)
@@ -182,13 +183,13 @@ export function PdfReportGenerator({ formatCurrency }: PdfReportGeneratorProps) 
       const { data: payments, error: paymentsError } = await supabase
         .from("member_payments")
         .select(`
-          *,
-          members (
-            id,
-            name,
-            class
-          )
-        `)
+        *,
+        members (
+          id,
+          name,
+          class
+        )
+      `)
         .eq("month", selectedMonth)
         .eq("year", selectedYear)
 
@@ -200,7 +201,7 @@ export function PdfReportGenerator({ formatCurrency }: PdfReportGeneratorProps) 
 
       // Add title
       doc.setFontSize(20)
-      doc.text(`Laporan Keanggotaan Ekstrakurikuler Badminton`, 105, 20, { align: "center" })
+      doc.text("Laporan Keanggotaan Ekstrakurikuler Badminton", 105, 20, { align: "center" })
       doc.setFontSize(16)
       doc.text(`${monthName} ${selectedYear}`, 105, 30, { align: "center" })
 
@@ -239,8 +240,7 @@ export function PdfReportGenerator({ formatCurrency }: PdfReportGeneratorProps) 
           ? formatCurrency(Number(payments?.find((p) => p.member_id === member.id)?.amount || 0))
           : "-",
       ])
-
-      autoTable(doc, {
+      ;(doc as any).autoTable({
         head: [["Nama", "Kelas", "Status", "Tanggal Bayar", "Jumlah"]],
         body: memberRows,
         startY: 115,
@@ -249,12 +249,13 @@ export function PdfReportGenerator({ formatCurrency }: PdfReportGeneratorProps) 
         alternateRowStyles: { fillColor: [240, 240, 240] },
       })
 
-      // Save the PDF
-      doc.save(`Laporan_Keanggotaan_${monthName}_${selectedYear}.pdf`)
+      // Save the PDF with proper filename
+      const filename = `Laporan_Keanggotaan_${monthName}_${selectedYear}.pdf`
+      doc.save(filename)
 
       toast({
         title: "Berhasil!",
-        description: "Laporan keanggotaan berhasil dibuat",
+        description: `Laporan keanggotaan berhasil dibuat: ${filename}`,
       })
     } catch (error) {
       console.error("Error generating report:", error)
